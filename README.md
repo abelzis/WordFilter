@@ -2,7 +2,7 @@
 Filters words given text and sorts them by count. Also cross-references are printed where in the original text the word was given.
 
 # How to use
-You can generate the project with [`CMake`](https://cmake.org/download/). Just make sure you have [`Git`](https://git-scm.com/download/) in order to download [`GoogleTest`](https://github.com/google/googletest) for test project support. Otherwise, use CMake just on the `WordFilter/` folder.
+You can generate the project with [`CMake`](https://cmake.org/download/). Just make sure you have [`Git`](https://git-scm.com/download/) in order to download [`GoogleTest`](https://github.com/google/googletest) for test project support. Otherwise, use CMake just in the `WordFilter/` folder.
 
 Place desired text in a file
 
