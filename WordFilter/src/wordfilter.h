@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 using std::ifstream;
+using std::map;
 using std::multimap;
 using std::ofstream;
 using std::string;
@@ -16,6 +17,13 @@ using std::string;
 bool isLetter_(const char& chr)
 {
 	if (chr >= 'a' && chr <= 'z')
+		return true;
+	return false;
+}
+
+bool isBadSymbol_(const char& chr)
+{
+	if (chr > 32 && chr < 127)
 		return true;
 	return false;
 }
@@ -90,7 +98,9 @@ private:
 
 	string text_;
 	multimap<char, Word> word_container_;
+	multimap<char, Word> url_container_;
 	multimap<unsigned int, Word> sorted_word_container;	//sorted by count
+
 
 
 	//PRIVATE FUNCTIONS
@@ -106,8 +116,7 @@ private:
 				string temp_str;
 				std::getline(inp, temp_str);	//readline
 				
-				text_ += temp_str;				//append
-				text_ += '\n';
+				text_ += " " + temp_str + " \n";				//append
 			}
 		}
 		else
@@ -140,6 +149,47 @@ private:
 		return 0;
 	}
 
+	//check if 'http://', 'https://', 'www.'
+	bool checkIfUrl(const string& str)
+	{
+		if (str[0] == 'h')
+			if (str[1] == 't' && str[2] == 't' && str[3] == 'p')
+			{
+				if (str[4] == 's' && str[5] == ':' && str[6] == '/' && str[7] == '/')
+					return true;
+				if (str[4] == ':' && str[5] == '/' && str[6] == '/')
+					return true;
+			}
+
+		if (str[0] == 'w')
+			if (str[1] == 'w' && str[2] == 'w' && str[3] == '.')
+				return true;
+		return false;
+	}
+
+	void insertToMultimapContainer(multimap<char, Word>& container, const string& temp_word, const unsigned int& current_paragraph,
+		const unsigned int& current_sentence)
+	{
+		auto multi_it = container.equal_range(temp_word[0]);
+
+		bool found = false;
+		for (auto i = multi_it.first; i != multi_it.second; i++)
+			if (i->second.word() == temp_word)
+			{
+				i->second++;
+				found = true;
+				break;
+			}
+		if (found == false)	//else add the word
+			container.insert({ temp_word[0], temp_word });
+
+		//save the location of the word
+		multi_it = container.equal_range(temp_word[0]);
+		for (auto i = multi_it.first; i != multi_it.second; i++)
+			if (i->second.word() == temp_word)
+				i->second.setPlace(current_paragraph, current_sentence);
+	}
+
 	//function extracts words from text and counts them
 	void countWords_()
 	{
@@ -168,59 +218,53 @@ private:
 
 			//extract a single first word, then remove from temporary string and repeat
 			int length_index = getUntilWhitespace_(temp_text);
-			
+
 			string temp_word;
 			temp_word.append(temp_text, 0, length_index);
 
-			//sort good characters at the begining of string, bad characters - at the end.
-			string::iterator it = std::stable_partition(temp_word.begin(), temp_word.end(), isLetter_);
+			bool if_url = checkIfUrl(temp_word);
 			
+			//sort good characters at the begining of string, bad characters - at the end.
+			string::iterator it;
+			if (!if_url)
+				it = std::stable_partition(temp_word.begin(), temp_word.end(), isLetter_);
+			if (if_url)
+				it = std::stable_partition(temp_word.begin(), temp_word.end(), isBadSymbol_);
+
+			string temp_word2(it, temp_word.end());
+
+			//erase bad characters
+			temp_word.erase(it, temp_word.end());
+			temp_word.shrink_to_fit();
+
+			//check if word is already in the map and increase the count
+
+			if (!if_url)
+				insertToMultimapContainer(word_container_, temp_word, current_paragraph, current_sentence);
+			else
+				insertToMultimapContainer(url_container_, temp_word, current_paragraph, current_sentence);
+
 			//check if sentences or paragraphs changed
-			if (checkForCharacter_(it, temp_word.end(), '\n'))
+			if (checkForCharacter_(temp_word2.begin(), temp_word2.end(), '\n'))
 			{
 				current_sentence = 1;
 				current_paragraph++;
 			}
 			else
-				current_sentence += checkForCharacter_(it, temp_word.end(), '.');
-
-
-			//erase bad characters
-			temp_word.erase(it, temp_word.end());
-			temp_word.shrink_to_fit();
+				if (!if_url)
+					current_sentence += checkForCharacter_(temp_word2.begin(), temp_word2.end(), '.');
 			
-			word_container_;
-
-			//check if word is already in the map and increase the count
-			auto multi_it = word_container_.equal_range(temp_word[0]);
-
-			bool found = false;
-			for (auto i = multi_it.first; i != multi_it.second; i++)
-				if (i->second.word() == temp_word)
-				{
-					i->second++;
-					found = true;
-					break;
-				}
-			if (found == false)	//else add the word
-				word_container_.insert({ temp_word[0], temp_word });
-
-			//save the location of the word
-			multi_it = word_container_.equal_range(temp_word[0]);
-			for (auto i = multi_it.first; i != multi_it.second; i++)
-				if (i->second.word() == temp_word)
-					i->second.setPlace(current_paragraph, current_sentence);
 
 			temp_text.erase(0, length_index + 1);	//delete name from temporary file_str string
 		}
 		
 	}
 
-	std::ostream& printWords_(std::ostream& out)
+	std::ostream& printWords_(multimap<char, Word> container, std::ostream& out)
 	{
 		if (out.fail())
 			throw std::ios_base::failure{ "ostream fail." };
-		for (const auto& it : word_container_)
+		for (const auto& it : container)
 			out << it.second << "\n\n";
 
 		return out;
@@ -238,7 +282,8 @@ private:
 		if (out.fail())
 			throw std::ios_base::failure{ "ostream fail." };
 		for (auto it = sorted_word_container.rbegin(); it != sorted_word_container.rend(); it++)
-			out << it->second << "\n\n";
+			if (it->second.count() > 1)
+				out << it->second << "\n\n";
 		return out;
 	}
 
@@ -271,7 +316,13 @@ public:
 
 	inline std::ostream& printWords(std::ostream& out)
 	{
-		try { return printWords_(out); }
+		try { return printWords_(word_container_, out); }
+		catch (std::exception& ex) { std::cerr << "Text::printWords_ Error: " << ex.what(); }
+	}
+
+	inline std::ostream& printURLs(std::ostream& out)
+	{
+		try { return printWords_(url_container_, out); }
 		catch (std::exception& ex) { std::cerr << "Text::printWords_ Error: " << ex.what(); }
 	}
 

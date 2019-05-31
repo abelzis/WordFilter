@@ -72,4 +72,7 @@ int main()
 		t.printWordsSortedByCount(res);
 	else
 		t.printWords(res);
+
+	ofstream resURLs("url_results.out");
+	t.printURLs(resURLs);
 }
