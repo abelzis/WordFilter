@@ -7,7 +7,7 @@ You can generate the project with [`CMake`](https://cmake.org/download/). Just m
 Follow the instructions and please insert desired text to filter out words.
 
 # Changelog
-### Patch [v1.0](https://github.com/abelzis/WordFilter/releases/tag/v1.0) (2019-05-21)
+### Patch [v1.0](https://github.com/abelzis/WordFilter/releases/tag/v1.0) (2019-05-22)
 **Added**
   - Filtering words from file
   - Exporting filtered words by count or by first alphabetical letter
