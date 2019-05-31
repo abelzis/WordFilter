@@ -7,6 +7,14 @@ You can generate the project with [`CMake`](https://cmake.org/download/). Just m
 Follow the instructions and please insert desired text to filter out words.
 
 # Changelog
+### Patch [v1.0.1](https://github.com/abelzis/WordFilter/releases/tag/v1.0.1) (2019-05-31)
+**Added**
+  - Filtering of URLs
+  
+**Fixed**
+  - Fixed errors with incorrect locations of words
+  - Fixed newline bugs
+
 ### Patch [v1.0](https://github.com/abelzis/WordFilter/releases/tag/v1.0) (2019-05-22)
 **Added**
   - Filtering words from file
