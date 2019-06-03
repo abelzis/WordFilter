@@ -6,6 +6,17 @@ You can generate the project with [`CMake`](https://cmake.org/download/). Just m
 
 Follow the instructions and please insert desired text to filter out words.
 
+# Results
+After scanning the text, app creates a cross-reference for all the words mentioned in the text (if count > 1 by default). For example, given text from [Oracle](https://www.oracle.com/sun/), results after running the app:
+
+![Results](https://i.gyazo.com/f33eae0db5812f02aad6eb4bba0b275f.png)
+
+Also, URL scanning is true, if an URL is present in the text. In e.g. [source](https://www.intelligenteconomist.com/url-shortener-services/) outputs:
+
+![URLs](https://i.gyazo.com/0cacec403df0f8019a8f6e3458aa803d.png)
+
+Have fun!
+
 # Changelog
 ### Patch [v1.0.1](https://github.com/abelzis/WordFilter/releases/tag/v1.0.1) (2019-05-31)
 **Added**
