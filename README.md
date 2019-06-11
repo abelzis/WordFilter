@@ -18,6 +18,10 @@ Also, URL scanning is true, if an URL is present in the text. In e.g. [source](h
 Have fun!
 
 # Changelog
+### Patch EXAM [v1.1](https://github.com/abelzis/WordFilter/releases/tag/v1.1) (2019-06-11)
+**Changed**
+  - Structure of output files.
+  
 ### Patch [v1.0.1](https://github.com/abelzis/WordFilter/releases/tag/v1.0.1) (2019-05-31)
 **Added**
   - Filtering of URLs
