@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <exception>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <string>
@@ -63,6 +64,8 @@ private:
 		string word() const { return word_; }
 		uint count() const { return count_; }
 
+		std::vector<Place> place() const { return place_; }
+
 		uint sentence(const uint& index) const 
 		{ 
 			if (index >= place_.size()) 
@@ -88,8 +91,16 @@ private:
 		{ 
 			out << word.word_ << "\nCount: " << word.count_ << '\n';
 			out << "Found in [Paragraph:Sentence] : ";
+			int uniquePara = -1, uniqueSent = -1;
 			for (const auto& it : word.place_)
+			{
+				if (it.paragraph == uniquePara && it.sentence == uniqueSent)
+					continue;
 				out << '[' << it.paragraph << ':' << it.sentence << "], ";
+				uniquePara = it.paragraph;
+				uniqueSent = it.sentence;
+			}
+
 			return out;
 		}
 	};
@@ -281,9 +292,126 @@ private:
 	{
 		if (out.fail())
 			throw std::ios_base::failure{ "ostream fail." };
-		for (auto it = sorted_word_container.rbegin(); it != sorted_word_container.rend(); it++)
+		int frst = 0;
+		for (auto it = sorted_word_container.begin(); it != sorted_word_container.end(); it++)
+		{ 
+			//std::cout << "NENENENENE\n";
 			if (it->second.count() > 1)
+			{
+				//std::cout << "HAHAHAHA\n";
+				/*it->second.word();
+				it->second.count();*/
+				string str;
+				str += it->second.word();
+				while (str.size() < 100)
+					str += " ";
+
+				it++;
+				if (it != sorted_word_container.end())
+					str += it->second.word();
+				out << str << "\n";
+				//out << it->second.word() << std::setw(100 - it->second.word().size());
+				//it++;
+				/*if (it != sorted_word_container.end())
+					out << it->second.word();*/
+				it--;
+
+				str.clear();
+				str += "Count: " + std::to_string(it->second.count());
+				while (str.size() < 100)
+					str += " ";
+
+				it++;
+				if (it != sorted_word_container.end())
+					str += "Count: " + std::to_string(it->second.count());
+				out << str << "\n";
+
+
+				//out << "\nCount: " << it->second.count() << std::setw(100 - 7) << "Count: ";
+				//it++;
+				//if (it != sorted_word_container.end())
+				//	out << it->second.count() << '\n';
+				//it--;
+
+				it--;
+				str.clear();
+				str += "Found in [Paragraph:Sentence] : ";
+
+				string str2;
+
+				int uniquePara = -1, uniqueSent = -1;
+				/*it->second.place();*/
+				for (const auto& it : it->second.place())
+				{
+					if (it.paragraph == uniquePara && it.sentence == uniqueSent)
+						continue;
+					if (str.length() < 100 - 10)
+						str += '[' + std::to_string(it.paragraph) + ':' + std::to_string(it.sentence) + "], ";
+					else
+						str2 += '[' + std::to_string(it.paragraph) + ':' + std::to_string(it.sentence) + "], ";
+					//out << '[' << it.paragraph << ':' << it.sentence << "], ";
+					uniquePara = it.paragraph;
+					uniqueSent = it.sentence;
+				}
+
+				while (str.size() < 100)
+					str += " ";
+
+				it++;
+				if (it != sorted_word_container.end())
+				{
+					str += "Found in [Paragraph:Sentence] : ";
+					uniquePara = -1, uniqueSent = -1;
+					/*it->second.place();*/
+					for (const auto& it : it->second.place())
+					{
+						if (it.paragraph == uniquePara && it.sentence == uniqueSent)
+							continue;
+						str += '[' + std::to_string(it.paragraph) + ':' + std::to_string(it.sentence) + "], ";
+						//out << '[' << it.paragraph << ':' << it.sentence << "], ";
+						uniquePara = it.paragraph;
+						uniqueSent = it.sentence;
+					}
+				}
+
+				out << str << "\n";
+				if (!str2.empty())
+					out << str2 << "\n";
+				out << "\n";
+				
+				//out << "Found in [Paragraph:Sentence] : ";
+
+				
+				//
+				//it++;
+
+				//out << std::setw(100);
+				//out << "Found in [Paragraph:Sentence] : ";
+
+				//uniquePara = -1, uniqueSent = -1;
+				///*it->second.place();*/
+				//if (it != sorted_word_container.end())
+				//	for (const auto& it : it->second.place())
+				//	{
+				//		if (it.paragraph == uniquePara && it.sentence == uniqueSent)
+				//			continue;
+				//		out << '[' << it.paragraph << ':' << it.sentence << "], ";
+				//		uniquePara = it.paragraph;
+				//		uniqueSent = it.sentence;
+				//	}
+				
+				/*out << it->second << "\n\n";
+				frst = 1;
+
+				it++;
+
 				out << it->second << "\n\n";
+				frst = 0;*/
+			}
+			if (it == sorted_word_container.end())
+				break;
+		}
+
 		return out;
 	}
 

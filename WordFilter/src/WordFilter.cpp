@@ -5,6 +5,10 @@
 
 int main()
 {
+	//SetConsoleOutputCP(CP_UTF8);
+	setvbuf(stdout, nullptr, _IOFBF, 1000);
+
+
 	ifstream inp;// ("text1.in");
 	inp.open("text1.in");
 	if (!inp.is_open())// || inp.fail())
